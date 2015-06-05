@@ -1,0 +1,410 @@
+﻿@{
+    ViewBag.Title = "Chat";
+}
+
+<link type="text/css" rel="stylesheet" href="Css/ChatStyle.css" />
+<link rel="stylesheet" href="/Css/JQueryUI/themes/base/jquery.ui.all.css">
+
+
+
+
+
+
+
+<div id="divLogin" class="mylogin">
+
+    User Name:<input id="txtUserName" type="text" /><br />
+    Password :   <input id="txtPassword" type="password" /><br />
+    <input id="btnLogin" type="button" value="Login" />
+    <div id="divalarm"></div>
+</div>
+
+<div>
+
+    @*<div id="welcome"></div><br />
+        <div id="divMessage" style="max-height:400px;min-height:400px; overflow-y:scroll;"></div>
+        <input id="txtMessage" type="text" />
+        <input id="btnSendMessage" type="button" value="Send" />*@
+    <div id="divContainer">
+        <div id="divLogin" class="login" style="display:none;">
+            <div>
+                Your Name:<br />
+                <input id="txtNickName" type="text" class="textBox" />
+            </div>
+            <div id="divButton">
+                <input id="btnStartChat" type="button" class="submitButton" value="Start Chat" />
+            </div>
+        </div>
+
+        <div id="divChat" class="chatRoom">
+            <div class="title">
+                <span id='spanUser'></span>Welcome to Chat Room
+
+            </div>
+            <div class="content">
+                <div id="divChatWindow" class="chatWindow">
+                </div>
+                <div id="divusers" class="users">
+                </div>
+            </div>
+            <div class="messageBar">
+                <input class="textbox" type="text" id="txtMessage" />
+                <input id="btnSendMsg" type="button" value="Send" class="submitButton" />
+            </div>
+        </div>
+
+        <input id="hdId" type="hidden" />
+        <input id="hdUserName" type="hidden" />
+    </div>
+
+
+</div>
+
+<input id="hUserId" type="hidden" />
+<input id="hId" type="hidden" />
+<input id="hUserName" type="hidden" />
+<input id="hGroup" type="hidden" />
+
+@section scripts {
+
+    <script src="~/Scripts/jquery-1.8.2.min.js"></script>
+    <script src="~/Scripts/jquery.signalR-2.0.1.min.js" type="text/javascript"></script>
+    <script src="~/signalr/hubs" type="text/javascript"></script>
+
+    <script src="~/Scripts/ui/jquery.ui.core.js"></script>
+    <script src="~/Scripts/ui/jquery.ui.widget.js"></script>
+    <script src="~/Scripts/ui/jquery.ui.mouse.js"></script>
+    <script src="~/Scripts/ui/jquery.ui.draggable.js"></script>
+    <script src="~/Scripts/ui/jquery.ui.resizable.js"></script>
+    @*<script type="text/javascript" src="@Url.Content("~/signalr/hubs")"></script>*@
+    @* <script type="text/javascript" src='<%= ResolveClientUrl("~/signalr/hubs") %>'></script>*@
+
+    <script>
+        $(function () { //This section will run whenever we call Chat.cshtml page
+
+            $("#divChat").hide();
+            $("#divLogin").show();
+
+            var objHub = $.connection.myHub;
+
+            loadClientMethods(objHub);
+
+            $.connection.hub.start().done(function () {
+
+                loadEvents(objHub);
+
+            });
+            $.connection.hub.error(function (error) {
+                console.log('SignalR error: ' + error)
+            });
+
+        });
+        function setScreen(isLogin) {
+
+            if (!isLogin) {
+
+                $("#divChat").hide();
+                $("#divLogin").show();
+            }
+            else {
+
+                $("#divChat").show();
+                $("#divLogin").hide();
+            }
+
+        }
+
+        function loadEvents(objHub) {
+
+            $("#btnLogin").click(function () {
+
+                var name = $("#txtUserName").val();
+                var pass = $("#txtPassword").val();
+
+                if (name.length > 0 && pass.length > 0) {
+                    // <<<<<-- ***** Return to Server [  Connect  ] *****
+                    objHub.server.connect(name, pass);
+
+                }
+                else {
+                    alert("Please Insert UserName and Password");
+                }
+
+            });
+
+
+            $('#btnSendMessage').click(function () {
+
+                var msg = $("#txtMessage").val();
+
+                if (msg.length > 0) {
+
+                    var userName = $('#hUserName').val();
+                    // <<<<<-- ***** Return to Server [  SendMessageToGroup  ] *****
+                    objHub.server.sendMessageToGroup(userName, msg);
+
+                }
+            });
+
+
+            $("#txtPassword").keypress(function (e) {
+                if (e.which == 13) {
+                    $("#btnLogin").click();
+                }
+            });
+
+            $("#txtMessage").keypress(function (e) {
+                if (e.which == 13) {
+                    $('#btnSendMessage').click();
+                }
+            });
+
+
+        }
+
+
+
+        function loadClientMethods(objHub) {
+
+            objHub.client.NoExistAdmin = function () {
+                var divNoExist = $('<div><p>There is no Admin to response you try again later</P></div>');
+                $("#divChat").hide();
+                $("#divLogin").show();
+
+                $(divNoExist).hide();
+                $('#divalarm').prepend(divNoExist);
+                $(divNoExist).fadeIn(900).delay(9000).fadeOut(900);
+            }
+
+            objHub.client.getMessages = function (userName, message, ImagePath) {
+
+                $("#txtMessage").val('');
+                $('#divMessage').append('<div><img src=' + ImagePath + ' alt="Smiley face" height="32" width="42"><p>' + userName + ': ' + message + '</p></div>');
+
+                var height = $('#divMessage')[0].scrollHeight;
+                $('#divMessage').scrollTop(height);
+            }
+
+            objHub.client.onConnected = function (id, userName, UserID, userGroup, ImagePath, UsersList, CurrentMessage) {
+
+                setScreen(true);
+
+                $('#hdId').val(UserID);
+                $('#hdUserName').val(userName);
+
+
+                var strWelcome = 'Welcome' + +userName;
+                $('#spanUser').append('<div><img src=' + ImagePath + ' alt="Smiley face" height="32" width="42"><p>Welcome:' + userName + '</p></div>');
+                // Add All Users
+                for (i = 0; i < UsersList.length; i++) {
+                    debugger;
+                    AddUser(objHub, UsersList[i].UserID, UsersList[i].UserName);
+                }
+
+                // Add Existing Messages
+                for (i = 0; i < CurrentMessage.length; i++) {
+
+                    AddMessage(CurrentMessage[i].UserName, CurrentMessage[i].Message);
+                }
+
+
+                $('#hUserId').val(UserID);
+                $('#hUserName').val(userName);
+
+                $('#hGroup').val(userGroup);
+
+                $("#divChat").show();
+                $("#divLogin").hide();
+
+
+            }
+            // Calls when user successfully logged in
+            //objHub.client.onConnected = function (id, userName, allUsers, messages) {
+
+            //    setScreen(true);
+
+            //    $('#hdId').val(id);
+            //    $('#hdUserName').val(userName);
+            //    $('#spanUser').html(userName);
+
+            //    // Add All Users
+            //    for (i = 0; i < allUsers.length; i++) {
+
+            //        AddUser(objHub, allUsers[i].ConnectionId, allUsers[i].UserName);
+            //    }
+
+            //    // Add Existing Messages
+            //    for (i = 0; i < messages.length; i++) {
+
+            //        AddMessage(messages[i].UserName, messages[i].Message);
+            //    }
+
+
+            //}
+
+            // On New User Connected
+            objHub.client.onNewUserConnected = function (id, name) {
+
+                AddUser(objHub, id, name);
+            }
+
+
+            // On User Disconnected
+            objHub.client.onUserDisconnected = function (id, userName) {
+
+                $('#' + id).remove();
+
+                var ctrId = 'private_' + id;
+                $('#' + ctrId).remove();
+
+
+                var disc = $('<div class="disconnect">"' + userName + '" logged off.</div>');
+
+                $(disc).hide();
+                $('#divusers').prepend(disc);
+                $(disc).fadeIn(200).delay(2000).fadeOut(200);
+
+
+            }
+
+            objHub.client.messageReceived = function (userName, message) {
+
+                AddMessage(userName, message);
+            }
+            objHub.client.sendPrivateMessage = function (windowId, fromUserName, message) {
+
+                var ctrId = 'private_' + windowId;
+
+
+                if ($('#' + ctrId).length == 0) {
+
+                    createPrivateChatWindow(objHub, windowId, ctrId, fromUserName);
+
+                }
+
+                $('#' + ctrId).find('#divMessage').append('<div class="message"><span class="userName">' + fromUserName + '</span>: ' + message + '</div>');
+
+                // set scrollbar
+                var height = $('#' + ctrId).find('#divMessage')[0].scrollHeight;
+                $('#' + ctrId).find('#divMessage').scrollTop(height);
+
+            }
+
+        }
+
+        function AddUser(chatHub, id, name) {
+
+            var userId = $('#hdId').val();
+
+            var code = "";
+
+            if (userId == id) {
+
+                code = $('<div class="loginUser">' + name + "</div>");
+
+            }
+            else {
+
+                code = $('<a id="' + id + '" class="user" >' + name + '<a>');
+
+                $(code).dblclick(function () {
+
+                    var id = $(this).attr('id');
+
+                    if (userId != id)
+                        OpenPrivateChatWindow(chatHub, id, name);
+
+                });
+            }
+
+            $("#divusers").append(code);
+
+        }
+
+        function AddMessage(userName, message) {
+            $('#divChatWindow').append('<div class="message"><span class="userName">' + userName + '</span>: ' + message + '</div>');
+
+            var height = $('#divChatWindow')[0].scrollHeight;
+            $('#divChatWindow').scrollTop(height);
+        }
+
+        function OpenPrivateChatWindow(chatHub, id, userName) {
+
+            var ctrId = 'private_' + id;
+
+            if ($('#' + ctrId).length > 0) return;
+
+            createPrivateChatWindow(chatHub, id, ctrId, userName);
+
+        }
+
+        function createPrivateChatWindow(chatHub, userId, ctrId, userName) {
+
+            var div = '<div id="' + ctrId + '" class="ui-widget-content draggable" rel="0">' +
+                       '<div class="header">' +
+                          '<div  style="float:right;">' +
+                              '<img id="imgDelete"  style="cursor:pointer;" src="/Images/delete.png"/>' +
+                           '</div>' +
+
+                           '<span class="selText" rel="0">' + userName + '</span>' +
+                       '</div>' +
+                       '<div id="divMessage" class="messageArea">' +
+
+                       '</div>' +
+                       '<div class="buttonBar">' +
+                          '<input id="txtPrivateMessage" class="msgText" type="text"   />' +
+                          '<input id="btnSendMessage" class="submitButton button" type="button" value="Send"   />' +
+                       '</div>' +
+                    '</div>';
+
+            var $div = $(div);
+
+            // DELETE BUTTON IMAGE
+            $div.find('#imgDelete').click(function () {
+                $('#' + ctrId).remove();
+            });
+
+            // Send Button event
+            $div.find("#btnSendMessage").click(function () {
+
+                $textBox = $div.find("#txtPrivateMessage");
+                var msg = $textBox.val();
+                if (msg.length > 0) {
+
+                    chatHub.server.sendPrivateMessage(userId, msg);
+                    $textBox.val('');
+                }
+            });
+
+            // Text Box event
+            $div.find("#txtPrivateMessage").keypress(function (e) {
+                if (e.which == 13) {
+                    $div.find("#btnSendMessage").click();
+                }
+            });
+
+            AddDivToContainer($div);
+
+        }
+
+        function AddDivToContainer($div) {
+            $('#divContainer').prepend($div);
+
+            $div.draggable({
+
+                handle: ".header",
+                stop: function () {
+
+                }
+            });
+
+            ////$div.resizable({
+            ////    stop: function () {
+
+            ////    }
+            ////});
+
+        }
+
+    </script>
+}
