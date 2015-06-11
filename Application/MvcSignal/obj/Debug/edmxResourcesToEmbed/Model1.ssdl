@@ -5,14 +5,14 @@
       <PropertyRef Name="ConID" />
     </Key>
     <Property Name="ConID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="ConnectionIDUser" Type="nvarchar" MaxLength="100" />
-    <Property Name="ConnectionIDAdmin" Type="nvarchar" MaxLength="100" />
-    <Property Name="UserGroup" Type="nvarchar" MaxLength="50" />
-    <Property Name="Msg" Type="ntext" />
-    <Property Name="StartTime" Type="nvarchar" MaxLength="50" />
-    <Property Name="EndTime" Type="nvarchar" MaxLength="50" />
-    <Property Name="MsgDate" Type="nvarchar" MaxLength="50" />
-    <Property Name="MsgDuration" Type="nvarchar" MaxLength="50" />
+    <Property Name="ConnectionIDUser" Type="nvarchar" MaxLength="150" />
+    <Property Name="ConnectionIDAdmin" Type="nvarchar" MaxLength="150" />
+    <Property Name="UserGroup" Type="nvarchar" MaxLength="150" />
+    <Property Name="Msg" Type="nvarchar" MaxLength="150" />
+    <Property Name="StartTime" Type="nvarchar" MaxLength="150" />
+    <Property Name="EndTime" Type="nvarchar" MaxLength="150" />
+    <Property Name="MsgDate" Type="nvarchar" MaxLength="150" />
+    <Property Name="MsgDuration" Type="nvarchar" MaxLength="150" />
     <Property Name="UserID" Type="int" />
     <Property Name="AdminID" Type="int" />
   </EntityType>
@@ -21,17 +21,17 @@
       <PropertyRef Name="DepID" />
     </Key>
     <Property Name="DepID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="DepName" Type="nvarchar" MaxLength="50" />
+    <Property Name="DepName" Type="nvarchar" MaxLength="150" />
   </EntityType>
   <EntityType Name="tbl_User">
     <Key>
       <PropertyRef Name="UserID" />
     </Key>
     <Property Name="UserID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="UserName" Type="nvarchar" MaxLength="50" />
+    <Property Name="UserName" Type="nvarchar" MaxLength="150" />
     <Property Name="Password" Type="nvarchar" MaxLength="50" />
-    <Property Name="AdminCode" Type="int" Nullable="false" />
-    <Property Name="ImagePath" Type="nvarchar" MaxLength="2000" />
+    <Property Name="AdminCode" Type="int" />
+    <Property Name="ImagePath" Type="nvarchar(max)" />
     <Property Name="DepartmentID" Type="int" />
   </EntityType>
   <Association Name="FK_tbl_User_tbl_Dep">

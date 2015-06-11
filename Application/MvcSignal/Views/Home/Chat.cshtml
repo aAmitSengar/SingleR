@@ -23,7 +23,7 @@
 
     @*<div id="welcome"></div><br />
         <div id="divMessage" style="max-height:400px;min-height:400px; overflow-y:scroll;"></div>
-        <input id="txtMessage" type="text" />
+        <input id="txtMessageTOAll" type="text" />
         <input id="btnSendMessage" type="button" value="Send" />*@
     <div id="divContainer">
         <div id="divLogin" class="login" style="display:none;">
@@ -48,8 +48,8 @@
                 </div>
             </div>
             <div class="messageBar">
-                <input class="textbox" type="text" id="txtMessage" />
-                <input id="btnSendMsg" type="button" value="Send" class="submitButton" />
+                <input class="textbox" type="text" id="txtMessageTOAll" />
+                <input id="btnSendMsgTOAll" type="button" value="Send" class="submitButton" />
             </div>
         </div>
 
@@ -135,7 +135,7 @@
 
             $('#btnSendMessage').click(function () {
 
-                var msg = $("#txtMessage").val();
+                var msg = $("#txtMessageTOAll").val();
 
                 if (msg.length > 0) {
 
@@ -153,13 +153,32 @@
                 }
             });
 
-            $("#txtMessage").keypress(function (e) {
+            $("#txtMessageTOAll").keypress(function (e) {
                 if (e.which == 13) {
                     $('#btnSendMessage').click();
                 }
             });
+            $('#btnSendMsgTOAll').click(function () {
 
+                var msg = $("#txtMessageTOAll").val();
+                if (msg.length > 0) {
 
+                    var userName = $('#hdUserName').val();
+                    objHub.server.sendMessageToAll(userName, msg);
+                    $("#txtMessageTOAll").val('');
+                }
+            });
+            $("#txtNickName").keypress(function (e) {
+                if (e.which == 13) {
+                    $("#btnStartChat").click();
+                }
+            });
+
+            $("#txtMessageTOAll").keypress(function (e) {
+                if (e.which == 13) {
+                    $('#btnSendMsgTOAll').click();
+                }
+            });
         }
 
 
@@ -178,7 +197,7 @@
 
             objHub.client.getMessages = function (userName, message, ImagePath) {
 
-                $("#txtMessage").val('');
+                $("#txtMessageTOAll").val('');
                 $('#divMessage').append('<div><img src=' + ImagePath + ' alt="Smiley face" height="32" width="42"><p>' + userName + ': ' + message + '</p></div>');
 
                 var height = $('#divMessage')[0].scrollHeight;
@@ -189,7 +208,7 @@
 
                 setScreen(true);
 
-                $('#hdId').val(UserID);
+                $('#hdId').val(id);
                 $('#hdUserName').val(userName);
 
 
@@ -197,14 +216,14 @@
                 $('#spanUser').append('<div><img src=' + ImagePath + ' alt="Smiley face" height="32" width="42"><p>Welcome:' + userName + '</p></div>');
                 // Add All Users
                 for (i = 0; i < UsersList.length; i++) {
-                    debugger;
-                    AddUser(objHub, UsersList[i].UserID, UsersList[i].UserName);
+
+                    AddUser(objHub, UsersList[i].ConnectionId, UsersList[i].UserName);
                 }
 
                 // Add Existing Messages
                 for (i = 0; i < CurrentMessage.length; i++) {
 
-                    AddMessage(CurrentMessage[i].UserName, CurrentMessage[i].Message);
+                    AddMessage(CurrentMessage[i].ConnectionId, CurrentMessage[i].Message, ImagePath);
                 }
 
 
@@ -267,9 +286,9 @@
 
             }
 
-            objHub.client.messageReceived = function (userName, message) {
+            objHub.client.messageReceived = function (userName, message, ImagePath) {
 
-                AddMessage(userName, message);
+                AddMessage(userName, message, ImagePath);
             }
             objHub.client.sendPrivateMessage = function (windowId, fromUserName, message) {
 
@@ -292,7 +311,7 @@
 
         }
 
-        function AddUser(chatHub, id, name) {
+        function AddUser(objHub, id, name) {
 
             var userId = $('#hdId').val();
 
@@ -312,7 +331,7 @@
                     var id = $(this).attr('id');
 
                     if (userId != id)
-                        OpenPrivateChatWindow(chatHub, id, name);
+                        OpenPrivateChatWindow(objHub, id, name);
 
                 });
             }
@@ -321,24 +340,24 @@
 
         }
 
-        function AddMessage(userName, message) {
-            $('#divChatWindow').append('<div class="message"><span class="userName">' + userName + '</span>: ' + message + '</div>');
+        function AddMessage(userName, message, ImageURL) {
+            $('#divChatWindow').append('<div class="message"><img src=' + ImageURL + ' alt="Smiley face" height="32" width="42"><span class="userName">' + userName + '</span>: ' + message + '</div>');
 
             var height = $('#divChatWindow')[0].scrollHeight;
             $('#divChatWindow').scrollTop(height);
         }
 
-        function OpenPrivateChatWindow(chatHub, id, userName) {
+        function OpenPrivateChatWindow(objHub, id, userName) {
 
             var ctrId = 'private_' + id;
 
             if ($('#' + ctrId).length > 0) return;
 
-            createPrivateChatWindow(chatHub, id, ctrId, userName);
+            createPrivateChatWindow(objHub, id, ctrId, userName);
 
         }
 
-        function createPrivateChatWindow(chatHub, userId, ctrId, userName) {
+        function createPrivateChatWindow(objHub, userId, ctrId, userName) {
 
             var div = '<div id="' + ctrId + '" class="ui-widget-content draggable" rel="0">' +
                        '<div class="header">' +
@@ -371,7 +390,7 @@
                 var msg = $textBox.val();
                 if (msg.length > 0) {
 
-                    chatHub.server.sendPrivateMessage(userId, msg);
+                    objHub.server.sendPrivateMessage(userId, msg);
                     $textBox.val('');
                 }
             });

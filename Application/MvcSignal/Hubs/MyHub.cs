@@ -65,7 +65,7 @@ namespace MvcSignal
                     if (UsersList.Count(x => x.ConnectionId == id) == 0)
                     {
                         var UserNew = (from s in UsersList where (s.UserID == userInfo.UserID) select s).ToList();
-                        if (UserNew.Count()>0) { }
+                        if (UserNew.Count() > 0) { }
                         else
                         {
 
@@ -133,7 +133,16 @@ namespace MvcSignal
             }
 
         }
+        public void SendMessageToAll(string userName, string message)
+        {
+            //get sender user
+            var strg = (from s in UsersList where (s.UserName == userName) select s).First();
+            // store last 100 messages in cache
+            AddMessageinCache(userName, message, strg.ImagePath);
 
+            // Broad cast message
+            Clients.All.messageReceived(userName, message, strg.ImagePath);
+        }
         //--group ***** Receive Request From Client [  SendMessageToGroup  ] *****
         public void SendMessageToGroup(string userName, string message)
         {
@@ -194,9 +203,9 @@ namespace MvcSignal
         }
         #region private Messages
 
-        private void AddMessageinCache(string userName, string message)
+        private void AddMessageinCache(string userName, string message, string ImagePath)
         {
-            MessageList.Add(new MessageInfo { UserName = userName, Message = message });
+            MessageList.Add(new MessageInfo { UserName = userName, Message = message, ImagePath = ImagePath });
 
             if (MessageList.Count > 100)
                 MessageList.RemoveAt(0);

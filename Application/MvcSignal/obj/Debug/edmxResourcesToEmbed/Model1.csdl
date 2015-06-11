@@ -13,15 +13,15 @@
     <Key>
       <PropertyRef Name="ConID" />
     </Key>
-    <Property Name="ConID" Type="Int32" Nullable="false" p1:StoreGeneratedPattern="Identity" />
-    <Property Name="ConnectionIDUser" Type="String" MaxLength="100" Unicode="true" FixedLength="false" />
-    <Property Name="ConnectionIDAdmin" Type="String" MaxLength="100" Unicode="true" FixedLength="false" />
-    <Property Name="UserGroup" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
-    <Property Name="Msg" Type="String" MaxLength="Max" Unicode="true" FixedLength="false" />
-    <Property Name="StartTime" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
-    <Property Name="EndTime" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
-    <Property Name="MsgDate" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
-    <Property Name="MsgDuration" Type="String" MaxLength="50" Unicode="true" FixedLength="false" />
+    <Property Name="ConID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="ConnectionIDUser" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+    <Property Name="ConnectionIDAdmin" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+    <Property Name="UserGroup" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+    <Property Name="Msg" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+    <Property Name="StartTime" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+    <Property Name="EndTime" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+    <Property Name="MsgDate" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+    <Property Name="MsgDuration" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
     <Property Name="UserID" Type="Int32" />
     <Property Name="AdminID" Type="Int32" />
   </EntityType>
@@ -30,7 +30,7 @@
       <PropertyRef Name="DepID" />
     </Key>
     <Property Name="DepID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-    <Property Name="DepName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="DepName" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
     <NavigationProperty Name="tbl_User" Relationship="TestModel.FK_tbl_User_tbl_Dep" FromRole="tbl_Dep" ToRole="tbl_User" />
   </EntityType>
   <EntityType Name="tbl_User">
@@ -38,10 +38,10 @@
       <PropertyRef Name="UserID" />
     </Key>
     <Property Name="UserID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-    <Property Name="UserName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="UserName" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
     <Property Name="Password" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-    <Property Name="AdminCode" Type="Int32" Nullable="false" />
-    <Property Name="ImagePath" Type="String" MaxLength="2000" FixedLength="false" Unicode="true" />
+    <Property Name="AdminCode" Type="Int32" />
+    <Property Name="ImagePath" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
     <Property Name="DepartmentID" Type="Int32" />
     <NavigationProperty Name="tbl_Dep" Relationship="TestModel.FK_tbl_User_tbl_Dep" FromRole="tbl_User" ToRole="tbl_Dep" />
   </EntityType>

@@ -17,7 +17,7 @@ namespace MvcSignal
         public int UserID { get; set; }
         public string UserName { get; set; }
         public string Password { get; set; }
-        public int AdminCode { get; set; }
+        public Nullable<int> AdminCode { get; set; }
         public string ImagePath { get; set; }
         public Nullable<int> DepartmentID { get; set; }
     

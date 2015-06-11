@@ -5,9 +5,9 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="6eeed94f5984416a8aa469d5a33b4bb1" Name="Diagram1">
-        <EntityTypeShape EntityType="TestModel.tbl_Conversation" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="TestModel.tbl_Dep" Width="1.5" PointX="3.375" PointY="0.75" />
-        <EntityTypeShape EntityType="TestModel.tbl_User" Width="1.5" PointX="3.375" PointY="3.75" />
+        <EntityTypeShape EntityType="TestModel.tbl_Conversation" Width="1.5" PointX="0.75" PointY="4.75" />
+        <EntityTypeShape EntityType="TestModel.tbl_Dep" Width="1.5" PointX="0.75" PointY="1.375" />
+        <EntityTypeShape EntityType="TestModel.tbl_User" Width="1.5" PointX="3" PointY="1" />
         <AssociationConnector Association="TestModel.FK_tbl_User_tbl_Dep" />
       </Diagram>
     </edmx:Diagrams>
